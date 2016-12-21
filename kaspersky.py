@@ -12,7 +12,7 @@
 from assemblyline.al.common.result import Result, SCORE
 from assemblyline.al.common.av_result import VirusHitTag, VirusHitSection
 from assemblyline.al.service.base import ServiceBase
-from assemblyline.al.service.kaspersky import icap
+from al_services.alsvc_kaspersky import icap
 
 
 class KasperskyIcap(ServiceBase):

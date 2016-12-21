@@ -1,1 +1,1 @@
-from assemblyline.al.service.kaspersky.kaspersky import KasperskyIcap
+from al_services.alsvc_kaspersky.kaspersky import KasperskyIcap
