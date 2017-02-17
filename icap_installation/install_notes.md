@@ -3,7 +3,7 @@ This will install Kaspersky for Proxy on either a VM or a baremetal box.
 
 **Prerequisites:**
 
-* You have to install the Ubuntu base OS before. See [Install Ubuntu Server](build_doc.html?fname=install_ubuntu_server.md)
+* You have to install the Ubuntu base OS before. See [Install Ubuntu Server](documentation.html?fname=install_ubuntu_server.md)
 * You have a copy of the latest Kaspersky for Proxy debian installer in your home folder (Doc was built with version: 5.5-86_i386)
 * You have a valid licence file in your home folder
 
