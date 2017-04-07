@@ -19,7 +19,7 @@ class KasperskyIcap(ServiceBase):
     SERVICE_CATEGORY = 'Antivirus'
     SERVICE_DESCRIPTION = "This services wraps Kaspersky ICAP Proxy."
     SERVICE_ENABLED = True
-    SERVICE_REVISION = ServiceBase.parse_revision('$Id: ddf5738da3fb148a06c87c1fcc807132abf3191b $')
+    SERVICE_REVISION = ServiceBase.parse_revision('$Id$')
     SERVICE_VERSION = '1'
     SERVICE_DEFAULT_CONFIG = {
         "ICAP_HOST": "localhost",
@@ -61,7 +61,7 @@ class KasperskyIcap(ServiceBase):
         x_virus_id = None
         result_lines = icap_result.strip().splitlines()
         if not len(result_lines) > 3:
-            raise Exception('Invalid result from Kaspersky ICAP server: %s', str(icap_result))
+            raise Exception('Invalid result from Kaspersky ICAP server: %s' % str(icap_result))
 
         xri_key = 'X-Response-Info:'
         xvirus_key = 'X-Virus-ID:'
