@@ -83,11 +83,11 @@ class IcapClient(object):
                 s = socket.create_connection((self.host, self.port), timeout=10)
                 s.sendall(serialized_request)
                 response = ""
-                while True:
+                for j in xrange(64):
                     try:
                         r_2 = s.recv(65565)
                         response += r_2
-                        if r_2 == "" or "\r\n\r\n" in response:
+                        if r_2 == "" or "\r\n\r\n" in response or len(response) >= 65565:
                             break
                     except socket.error as ret_code:
                         if ret_code.errno in [errno.ECONNRESET, errno.ECONNABORTED]:
