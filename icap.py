@@ -3,6 +3,7 @@
 import base64
 import os
 import socket
+import errno
 
 from cStringIO import StringIO
 
@@ -76,11 +77,33 @@ class IcapClient(object):
         sio.write('\r\n0\r\n\r\n')   # terminate with 0 length chunk
         serialized_request = sio.getvalue()
 
-        s = socket.create_connection((self.host, self.port))
-        s.send(serialized_request)
-        response = s.recv(65565)
-        s.close()
-        return response
+        _e = None
+        for i in xrange(3):
+            try:
+                s = socket.create_connection((self.host, self.port), timeout=10)
+                s.sendall(serialized_request)
+                response = ""
+                while True:
+                    try:
+                        r_2 = s.recv(65565)
+                        response += r_2
+                        if r_2 == "" or "\r\n\r\n" in response:
+                            break
+                    except socket.error as ret_code:
+                        if ret_code in [errno.ECONNRESET, errno.ECONNABORTED]:
+                            break
+                        raise
+                s.close()
+                if response != "":
+                    return response
+            except socket.error as e:
+                _e = e
+                continue
+
+        if _e is not None:
+            raise _e
+
+        raise Exception("Icap server refused to respond.")
 
 
 class KasperskyIcapClient(IcapClient):
