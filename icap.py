@@ -90,7 +90,7 @@ class IcapClient(object):
                         if r_2 == "" or "\r\n\r\n" in response:
                             break
                     except socket.error as ret_code:
-                        if ret_code in [errno.ECONNRESET, errno.ECONNABORTED]:
+                        if ret_code.errno in [errno.ECONNRESET, errno.ECONNABORTED]:
                             break
                         raise
                 s.close()
