@@ -93,12 +93,18 @@ class IcapClient(object):
                         if ret_code.errno in [errno.ECONNRESET, errno.ECONNABORTED]:
                             break
                         raise
-                s.close()
                 if response != "":
                     return response
             except socket.error as e:
                 _e = e
                 continue
+            finally:
+                # noinspection PyBroadException
+                try:
+                    # try to close the connection anyways
+                    s.close()
+                except:
+                    pass
 
         if _e is not None:
             raise _e
