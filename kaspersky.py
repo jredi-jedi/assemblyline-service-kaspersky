@@ -9,10 +9,30 @@
        You must have a Kaspersky AV for Proxy running on the local network.
 
 """
-from assemblyline.al.common.result import Result, SCORE
 from assemblyline.al.common.av_result import VirusHitTag, VirusHitSection
+from assemblyline.al.common.result import Result, SCORE
 from assemblyline.al.service.base import ServiceBase
-from al_services.alsvc_kaspersky import icap
+from assemblyline.common import icap
+
+
+class KasperskyIcapClient(icap.IcapClient):
+    """
+    Kaspersky flavoured ICAP Client.
+
+    Implemented against Kaspersky Anti-Virus for Proxy 5.5.
+    """
+
+    def __init__(self, host, port):
+        super(KasperskyIcapClient, self).__init__(host, port)
+
+    def get_service_version(self):
+        version = 'unknown'
+        options_result = self.options_respmod()
+        for line in options_result.splitlines():
+            if line.startswith('Service:'):
+                version = line[line.index(':')+1:].strip()
+                break
+        return version
 
 
 class KasperskyIcap(ServiceBase):
@@ -86,5 +106,5 @@ class KasperskyIcap(ServiceBase):
     def start(self):
         self.icap_host = self.cfg.get('ICAP_HOST')
         self.icap_port = int(self.cfg.get('ICAP_PORT'))
-        self.icap = icap.KasperskyIcapClient(self.icap_host, self.icap_port)
+        self.icap = KasperskyIcapClient(self.icap_host, self.icap_port)
         self._av_info = self.get_kaspersky_version()
