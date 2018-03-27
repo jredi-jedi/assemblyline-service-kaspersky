@@ -63,8 +63,8 @@ class KasperskyIcap(ServiceBase):
         request.task.report_service_context(self._av_info)
 
         # if deepscan request include the ICAP HTTP in debug info.
-        if request.task.deep_scan:
-            request.task.service_debug_info = icap_result
+        if request.task.deep_scan and request.task.profile:
+            request.task.set_debug_info(icap_result)
 
     def get_kaspersky_version(self):
         av_info = 'Kaspersky Antivirus for Proxy 5.5'
