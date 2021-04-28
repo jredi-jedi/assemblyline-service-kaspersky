@@ -9,10 +9,10 @@
        You must have a Kaspersky AV for Proxy running on the local network.
 
 """
-from assemblyline.al.common.av_result import VirusHitTag, VirusHitSection
-from assemblyline.al.common.result import Result, SCORE
-from assemblyline.al.service.base import ServiceBase
-from assemblyline.common import icap
+from typing import Optional, Dict
+from assemblyline_v4_service.common.result import Result, ResultSection
+from assemblyline_v4_service.common.base import ServiceBase
+from assemblyline_v4_service.common import icap
 
 
 class KasperskyIcapClient(icap.IcapClient):
@@ -22,59 +22,47 @@ class KasperskyIcapClient(icap.IcapClient):
     Implemented against Kaspersky Anti-Virus for Proxy 5.5.
     """
 
-    def __init__(self, host, port):
-        super(KasperskyIcapClient, self).__init__(host, port)
+    def __init__(self, host, port, respmod_service):
+        super(KasperskyIcapClient, self).__init__(host, port, respmod_service)
 
-    def get_service_version(self):
+    def get_kaspersky_version(self):
         version = 'unknown'
         options_result = self.options_respmod()
         for line in options_result.splitlines():
-            if line.startswith('Service:'):
+            if line.startswith('Server:'):
                 version = line[line.index(':')+1:].strip()
                 break
         return version
 
 
 class KasperskyIcap(ServiceBase):
-    SERVICE_CATEGORY = 'Antivirus'
-    SERVICE_DESCRIPTION = "This services wraps Kaspersky ICAP Proxy."
-    SERVICE_ENABLED = True
-    SERVICE_REVISION = ServiceBase.parse_revision('$Id$')
-    SERVICE_VERSION = '1'
-    SERVICE_DEFAULT_CONFIG = {
-        "ICAP_HOST": "localhost",
-        "ICAP_PORT": 1344,
-    }
-    SERVICE_CPU_CORES = 0.3
-    SERVICE_RAM_MB = 128
-
-    def __init__(self, cfg=None):
-        super(KasperskyIcap, self).__init__(cfg)
+    def __init__(self, config: Optional[Dict] = None) -> None:
+        super(KasperskyIcap, self).__init__(config)
         self.icap_host = None
         self.icap_port = None
         self.kaspersy_version = None
         self.icap = None
-        self._av_info = ''
+        # self._av_info = ''
 
     def execute(self, request):
-        payload = request.get()
-        icap_result = self.icap.scan_data(payload)
+        service_version = self.icap.get_kaspersky_version()
+        icap_result = self.icap.scan_data(request.file_contents, request.file_name)
         request.result = self.icap_to_alresult(icap_result)
-        request.task.report_service_context(self._av_info)
+        # request.task.report_service_context(self._av_info)
 
         # if deepscan request include the ICAP HTTP in debug info.
-        if request.task.deep_scan and request.task.profile:
-            request.task.set_debug_info(icap_result)
+        # if request.task.deep_scan and request.task.profile:
+        #     request.task.set_debug_info(icap_result)
 
-    def get_kaspersky_version(self):
-        av_info = 'Kaspersky Antivirus for Proxy 5.5'
-        defs = self.result_store.get_blob("kaspersky_update_definition")
-        if defs:
-            return "%s - Defs %s" % (av_info, defs.replace(".zip", "").replace("Updates", ""))
-        return av_info
+    # def get_kaspersky_version(self):
+    #     av_info = 'Kaspersky Antivirus for Proxy 5.5'
+    #     defs = self.result_store.get_blob("kaspersky_update_definition")
+    #     if defs:
+    #         return "%s - Defs %s" % (av_info, defs.replace(".zip", "").replace("Updates", ""))
+    #     return av_info
 
-    def get_tool_version(self):
-        return self._av_info
+    # def get_tool_version(self):
+    #     return self._av_info
 
     def icap_to_alresult(self, icap_result):
         x_response_info = None
@@ -98,13 +86,15 @@ class KasperskyIcap(ServiceBase):
             if not x_response_info == 'blocked':
                 self.log.warn('found virus id but response was: %s', str(x_response_info))
             virus_name = x_virus_id.replace('INFECTED ', '')
-            result.add_section(VirusHitSection(virus_name, SCORE.SURE))
-            result.append_tag(VirusHitTag(virus_name))
-            
+            virus_hit_section = ResultSection(virus_name)
+            virus_hit_section.set_heuristic(1)
+            virus_hit_section.add_tag("av.virus_name", virus_name)
+            result.add_section(virus_hit_section)
         return result
 
     def start(self):
-        self.icap_host = self.cfg.get('ICAP_HOST')
-        self.icap_port = int(self.cfg.get('ICAP_PORT'))
-        self.icap = KasperskyIcapClient(self.icap_host, self.icap_port)
-        self._av_info = self.get_kaspersky_version()
+        self.icap_host = self.config.get('icap_host')
+        self.icap_port = int(self.config.get('icap_port'))
+        self.respmod_endpoint = self.config.get("respmod_endpoint")
+        self.icap = KasperskyIcapClient(self.icap_host, self.icap_port, self.respmod_endpoint)
+        # self._av_info = self.get_kaspersky_version()
