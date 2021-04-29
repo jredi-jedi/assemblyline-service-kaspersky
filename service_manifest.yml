@@ -1,0 +1,40 @@
+name: KasperskyIcap
+version: $SERVICE_TAG
+description: This services wraps Kaspersky ICAP Proxy
+
+accepts: .*
+rejects: empty|metadata/.*
+
+stage: CORE
+category: Antivirus
+
+file_required: true
+timeout: 60
+disable_cache: false
+
+enabled: false
+is_external: false
+licence_count: 0
+
+config:
+  icap_host: "localhost"
+  icap_port: 1344
+  respmod_endpoint: "resp"
+
+heuristics:
+  - heur_id: 1
+    name: File is infected
+    score: 1000
+    filetype: '*'
+    description: Kaspersky Antivirus hit.
+
+  - heur_id: 2
+    name: File is suspicious
+    score: 500
+    filetype: '*'
+    description: Kaspersky Heuristic Analysis hit.
+
+docker_config:
+  allow_internet_access: true
+  image: ${REGISTRY}cccs/assemblyline-service-kaspersky:$SERVICE_TAG
+  cpu_cores: 0.25
