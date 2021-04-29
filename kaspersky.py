@@ -74,6 +74,9 @@ class Kaspersky(ServiceBase):
                 virus_name = line[len(xvirus_key):].strip()
                 break
 
+        # TODO: Isolate parts of X-Virus-ID according https://encyclopedia.kaspersky.com/knowledge/rules-for-naming/
+        # So that we can tag more items of interest
+
         if virus_name and "HEUR:" in virus_name:
             virus_name = virus_name.replace("HEUR:", "")
             virus_heur_section = ResultSection(virus_name)
