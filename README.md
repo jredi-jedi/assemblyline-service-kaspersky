@@ -8,7 +8,7 @@ This Assemblyline service interfaces with [Kaspersky Scan Engine in ICAP Mode](h
 
 The service uses our generic ICAP interface to send files to the proxy server for analysis and report the results back to the user.
 
-## Installation of Kas4Proxy
+## Installation of Kaspersky Scan Engine
 
 To install Kaspersky Scan Engine in ICAP Mode you can follow our detailed documentation [here](icap_installation/install_notes.md).
 
