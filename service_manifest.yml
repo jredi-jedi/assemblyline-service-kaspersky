@@ -1,4 +1,4 @@
-name: KasperskyIcap
+name: Kaspersky
 version: $SERVICE_TAG
 description: This services wraps Kaspersky ICAP Proxy
 
