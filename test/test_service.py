@@ -186,7 +186,7 @@ class TestKaspersky:
         from assemblyline_v4_service.common.task import Task
         from assemblyline.odm.messages.task import Task as ServiceTask
         from assemblyline_v4_service.common.request import ServiceRequest
-        from kaspersky import Kaspersky
+        from kaspersky import Kaspersky, KasperskyIcapClient
 
         kaspersky_class_instance.start()
 
@@ -198,6 +198,7 @@ class TestKaspersky:
         # For coverage
         service_request.task.deep_scan = True
         mocker.patch.object(Kaspersky, "_add_debug_information")
+        mocker.patch.object(KasperskyIcapClient, "scan_data", return_value="blah\nblah\nblah\nblah")
 
         # Actually executing the sample
         kaspersky_class_instance.execute(service_request)
