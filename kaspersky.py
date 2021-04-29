@@ -45,17 +45,19 @@ class Kaspersky(ServiceBase):
         self.respmod_endpoint: str = ""
         self.icap: Optional[KasperskyIcapClient] = None
 
+    def start(self) -> None:
+        self.icap_host = self.config['icap_host']
+        self.icap_port = int(self.config['icap_port'])
+        self.respmod_endpoint = self.config["respmod_endpoint"]
+        self.icap = KasperskyIcapClient(self.icap_host, self.icap_port, self.respmod_endpoint)
+
     def execute(self, request: ServiceRequest) -> None:
         request.result = Result()
         icap_result = self.icap.scan_data(request.file_contents, request.file_name)
 
         # if deepscan request include the ICAP HTTP and service version.
         if request.task.deep_scan:
-            service_version = self.icap.get_kaspersky_version()
-            service_version_section = ResultSection("Kaspersky Service Version", body=service_version)
-            debug_info_section = ResultSection("ICAP HTTP Response", body=icap_result)
-            request.result.add_section(service_version_section)
-            request.result.add_section(debug_info_section)
+            self._add_debug_information(request.result, icap_result)
 
         self._icap_to_alresult(request.result, icap_result)
 
@@ -78,8 +80,9 @@ class Kaspersky(ServiceBase):
             virus_hit_section.add_tag("av.virus_name", virus_name)
             result.add_section(virus_hit_section)
 
-    def start(self) -> None:
-        self.icap_host = self.config.get('icap_host')
-        self.icap_port = int(self.config.get('icap_port'))
-        self.respmod_endpoint = self.config.get("respmod_endpoint")
-        self.icap = KasperskyIcapClient(self.icap_host, self.icap_port, self.respmod_endpoint)
+    def _add_debug_information(self, result: Result, icap_result: str) -> None:
+        scan_engine_version = self.icap.get_kaspersky_version()
+        scan_engine_version_section = ResultSection("Kaspersky Scan Engine Version", body=scan_engine_version)
+        debug_info_section = ResultSection("ICAP HTTP Response", body=icap_result)
+        result.add_section(scan_engine_version_section)
+        result.add_section(debug_info_section)
