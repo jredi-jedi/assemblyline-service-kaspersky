@@ -74,7 +74,13 @@ class Kaspersky(ServiceBase):
                 virus_name = line[len(xvirus_key):].strip()
                 break
 
-        if virus_name:
+        if virus_name and "HEUR:" in virus_name:
+            virus_name = virus_name.replace("HEUR:", "")
+            virus_heur_section = ResultSection(virus_name)
+            virus_heur_section.set_heuristic(2)
+            virus_heur_section.add_tag("av.heuristic", virus_name)
+            result.add_section(virus_heur_section)
+        elif virus_name:
             virus_hit_section = ResultSection(virus_name)
             virus_hit_section.set_heuristic(1)
             virus_hit_section.add_tag("av.virus_name", virus_name)

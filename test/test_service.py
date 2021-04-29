@@ -232,6 +232,7 @@ class TestKaspersky:
             ("", "", {}, 0),
             ("blah\nblah\nblah\nblah", "", {}, 0),
             ("blah\nX-Virus-ID: virus_name\nblah\nblah", "virus_name", {"av.virus_name": ["virus_name"]}, 1),
+            ("blah\nX-Virus-ID: HEUR:virus_heur\nblah\nblah", "virus_heur", {"av.heuristic": ["virus_heur"]}, 2),
         ]
     )
     def test_icap_to_alresult(icap_result, expected_section_title, expected_tags, expected_heuristic, kaspersky_class_instance, dummy_result_class_instance):

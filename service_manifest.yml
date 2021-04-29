@@ -28,6 +28,12 @@ heuristics:
     filetype: '*'
     description: Kaspersky Antivirus hit.
 
+  - heur_id: 2
+    name: File is suspicious
+    score: 500
+    filetype: '*'
+    description: Kaspersky Heuristic Analysis hit.
+
 docker_config:
   allow_internet_access: true
   image: ${REGISTRY}cccs/assemblyline-service-kaspersky:$SERVICE_TAG
