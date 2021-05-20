@@ -1,6 +1,6 @@
 name: Kaspersky
 version: $SERVICE_TAG
-description: This services wraps Kaspersky ICAP Proxy
+description: This services wraps Kaspersky Scan Engine's ICAP Proxy
 
 accepts: .*
 rejects: empty|metadata/.*

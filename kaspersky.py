@@ -1,14 +1,3 @@
-""" Kaspersky AntiVirus Scanning Service.
-
-    This service interfaces with Kaspersky AntiVirus for Proxy via ICAP.
-
-    If was tested against:
-        Kaspersky Antivirus for Proxy v5.5
-
-    Dependencies:
-       You must have a Kaspersky AV for Proxy running on the local network.
-
-"""
 from typing import Optional, Dict
 
 from assemblyline_v4_service.common.request import ServiceRequest
@@ -21,7 +10,7 @@ class KasperskyIcapClient(IcapClient):
     """
     Kaspersky flavoured ICAP Client.
 
-    Implemented against Kaspersky Scan Engine v.
+    Implemented against Kaspersky Scan Engine
     """
 
     def __init__(self, host: str, port: int, respmod_service: str) -> None:
